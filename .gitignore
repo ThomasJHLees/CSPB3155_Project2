@@ -1,0 +1,4 @@
+project/build.properties
+project/target/
+target/
+.metals
