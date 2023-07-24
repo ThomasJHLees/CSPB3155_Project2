@@ -19,7 +19,15 @@ sealed trait Figure {
 
 case class Polygon(val cList: List[(Double, Double)]) extends Figure {
     //TODO: Define the bounding box of the polygon
-    override def getBoundingBox: (Double, Double, Double, Double ) = ???
+    override def getBoundingBox: (Double, Double, Double, Double ) = {
+        val cListX = cList.unzip._1
+        val cListY = cList.unzip._2
+        val xmax = cListX.max
+        val xmin = cListX.min
+        val ymax = cListY.max
+        val ymin = cListY.min
+        (xmin, xmax, ymin, ymax)
+    }
     //TODO: Create a new polygon by shifting each vertex in cList by (x,y)
     //    Do not change the order in which the vertices appear
     override def translate(shiftX: Double, shiftY: Double): Polygon = ???
