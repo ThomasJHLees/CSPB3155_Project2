@@ -18,19 +18,23 @@ sealed trait Figure {
  */
 
 case class Polygon(val cList: List[(Double, Double)]) extends Figure {
-    //TODO: Define the bounding box of the polygon
+    //TODONE Define the bounding box of the polygon
     override def getBoundingBox: (Double, Double, Double, Double ) = {
-        val cListX = cList.unzip._1
-        val cListY = cList.unzip._2
-        val xmax = cListX.max
-        val xmin = cListX.min
-        val ymax = cListY.max
-        val ymin = cListY.min
+        val cListXY = cList.unzip
+        val xmax = cListXY._1.max
+        val xmin = cListXY._1.min
+        val ymax = cListXY._2.max
+        val ymin = cListXY._2.min
         (xmin, xmax, ymin, ymax)
     }
-    //TODO: Create a new polygon by shifting each vertex in cList by (x,y)
+    //TODONE Create a new polygon by shifting each vertex in cList by (x,y)
     //    Do not change the order in which the vertices appear
-    override def translate(shiftX: Double, shiftY: Double): Polygon = ???
+    override def translate(shiftX: Double, shiftY: Double): Polygon = {
+        val newPoly = cList.map(
+            xy => (xy._1 + shiftX, xy._2 + shiftY)
+        )
+        Polygon(newPoly)
+    }
 
     // Function: render -- draw the polygon. Do not edit this function.
     override def render(g: Graphics2D, scaleX: Double, scaleY: Double, shiftX: Double, shiftY: Double) = {
@@ -50,11 +54,20 @@ case class Polygon(val cList: List[(Double, Double)]) extends Figure {
  */
 case class MyCircle(val c: (Double, Double), val r: Double) extends Figure {
     //TODO: Define the bounding box for the circle
-    override def getBoundingBox: (Double, Double, Double, Double) = ???
+    override def getBoundingBox: (Double, Double, Double, Double) = {
+        val xmin = c._1 - r
+        val xmax = c._1 + r
+        val ymin = c._2 - r
+        val ymax = c._2 + r
+        (xmin, xmax, ymin, ymax)
+    }
 
 
     //TODO: Create a new circle by shifting the center
-    override def translate(shiftX: Double, shiftY: Double): MyCircle = ???
+    override def translate(shiftX: Double, shiftY: Double): MyCircle = {
+        val newC = (c._1 + shiftX, c._2 + shiftY)
+        MyCircle(newC, r)
+    }
 
     // Function: render -- draw the polygon. Do not edit this function.
     override def render(g: Graphics2D, scaleX: Double, scaleY: Double, shiftX: Double, shiftY: Double) = {
@@ -74,7 +87,23 @@ case class MyCircle(val c: (Double, Double), val r: Double) extends Figure {
 class MyCanvas (val listOfObjects: List[Figure]) {
     // TODO: Write a function to get the boundingbox for the entire canvas.
     // Hint: use existing boundingbox functions defined in each figure.
-    def getBoundingBox: (Double, Double, Double, Double) = ???
+    def getBoundingBox: (Double, Double, Double, Double) = {
+        val boundries: List[(Double, Double, Double, Double)] = List()
+        Figure match {
+            case MyCircle(c,r) => {
+               boundries :+ MyCircle(c,r).getBoundingBox
+            }
+            case _ => {
+                boundries :+ _.getBoundingBox
+            }
+        }
+        val boundryLimits = boundries.unzip
+        val xmin = boundryLimits._1.min
+        val xmax = boundryLimits._2.max
+        val ymin = boundryLimits._3.min
+        val ymax = boundryLimits._4.max
+        (xmin, max, ymin, ymax)
+    }
 
     //TODO: Write a function to translate each figure in the canvas by shiftX, shiftY
     def translate(shiftX: Double, shiftY: Double): MyCanvas = ???
