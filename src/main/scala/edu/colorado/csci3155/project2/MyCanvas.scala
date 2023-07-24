@@ -99,17 +99,34 @@ class MyCanvas (val listOfObjects: List[Figure]) {
     }
 
     //TODO: Write a function to translate each figure in the canvas by shiftX, shiftY
-    def translate(shiftX: Double, shiftY: Double): MyCanvas = ???
+    def translate(shiftX: Double, shiftY: Double): MyCanvas = {
+        val newObjList = listOfObjects.map(f => f.translate(shiftX, shiftY))
+        new MyCanvas(newObjList)
+    }
 
     //TODO: Write a function that will return a new MyCanvas object that places
     // all the objects in myc2 to the right of the objects in this MyCanvas.
     // refer to the notebook documentation on how to perform this.
-    def placeRight(myc2: MyCanvas):MyCanvas = ???
+    def placeRight(myc2: MyCanvas):MyCanvas = {
+        val c2Bounds = myc2.getBoundingBox
+        val origBounds = getBoundingBox
+        val xShift = (origBounds._2 - origBounds._1)
+        val yShift = (origBounds._4 - origBounds._3)/2 - (c2Bounds._4 - c2Bounds._3)/2
+        val newc2 = myc2.translate(xShift, yShift)
+        overlap(newc2)
+    }
 
     //TODO: Write a function that will return a new MyCanvas object that places
     // all the figures in myc2 on top of the figures in this MyCanvas.
     // refer to the notebook documentation on how to perform this.
-    def placeTop(myc2: MyCanvas): MyCanvas = ???
+    def placeTop(myc2: MyCanvas): MyCanvas = {
+        val c2Bounds = myc2.getBoundingBox
+        val origBounds = getBoundingBox
+        val xShift = (origBounds._2 - origBounds._1)/2 - (c2Bounds._2 - c2Bounds._1)/2
+        val yShift = (origBounds._4 - origBounds._3)
+        val newc2 = myc2.translate(xShift, yShift)
+        overlap(newc2)
+    }
 
     //TODO: Write a function that will rotate each figure in the canvas using
     // the angle `ang` defined in radians.
@@ -118,7 +135,25 @@ class MyCanvas (val listOfObjects: List[Figure]) {
     //             appropriate signature.
     // rotating a polygon is simply rotating each vertex.
     // rotating a circle is simply rotating the center with radius unchanged.
-    def rotate(angRad: Double): MyCanvas = ???
+    def rotate(angRad: Double): MyCanvas = {
+        val rotatedList:List[Figure] = listOfObjects.map(f => f match {
+            case MyCircle(c,r) => {
+                val x = (c._1 * math.cos(angRad)) - (c._2 * math.sin(angRad))
+                val y = (c._1 * math.sin(angRad)) + (c._2 * math.cos(angRad))
+                val newC = (x,y)
+                MyCircle(newC, r)
+            }
+            case Polygon(cList) => {
+                val newcList = cList.map(xy => {
+                    val x = ((xy._1 * math.cos(angRad)) - (xy._2 * math.sin(angRad)))
+                    val y = ((xy._1 * math.sin(angRad)) + (xy._2 * math.cos(angRad)))
+                    (x,y)
+                })
+                Polygon(newcList)
+            }
+        })
+        new MyCanvas(rotatedList)
+    }
 
     // Function to draw the canvas. Do not edit.
     def render(g: Graphics2D, xMax: Double, yMax: Double) = {
