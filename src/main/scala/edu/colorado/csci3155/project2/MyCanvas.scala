@@ -88,21 +88,14 @@ class MyCanvas (val listOfObjects: List[Figure]) {
     // TODO: Write a function to get the boundingbox for the entire canvas.
     // Hint: use existing boundingbox functions defined in each figure.
     def getBoundingBox: (Double, Double, Double, Double) = {
-        val boundries: List[(Double, Double, Double, Double)] = List()
-        Figure match {
-            case MyCircle(c,r) => {
-               boundries :+ MyCircle(c,r).getBoundingBox
-            }
-            case _ => {
-                boundries :+ _.getBoundingBox
-            }
+        val boundries: List[(Double, Double, Double, Double)] = {
+            listOfObjects.map(f => f.getBoundingBox)
         }
-        val boundryLimits = boundries.unzip
-        val xmin = boundryLimits._1.min
-        val xmax = boundryLimits._2.max
-        val ymin = boundryLimits._3.min
-        val ymax = boundryLimits._4.max
-        (xmin, max, ymin, ymax)
+        val xmin = boundries.minBy(_._1)._1
+        val xmax = boundries.maxBy(_._2)._2
+        val ymin = boundries.minBy(_._3)._3
+        val ymax = boundries.maxBy(_._4)._4
+        (xmin, xmax, ymin, ymax)
     }
 
     //TODO: Write a function to translate each figure in the canvas by shiftX, shiftY
