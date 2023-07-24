@@ -12,7 +12,17 @@ object Interpreter {
         case Const(d) => NumValue(d)
         case ConstBool(b) => BoolValue(b)
         case Ident(s) => env.lookup(s)
-        case Line(l) => ??? //TODO: Handle a line object
+        case Line(l) => {
+            val eval1 = evalExpr(l, env)
+            eval1 match {
+                case NumValue(l1) => {
+                    val newcList:List[(Double,Double)] = List((0,0),(l1,0))
+                    val newPoly = List(Polygon(newcList))
+                    FigValue(new MyCanvas(newPoly))
+                }
+                case default => throw new IllegalArgumentException("A NumValue must be procided for Line")
+            }
+        }
         case EquiTriangle(sideLength) => ??? // TODO: Handle Equilateral Triangle
         case Rectangle(sideLength) => ??? // TODO: Handle square given the side length
         case Circle(rad) => ??? //TODO: Handle circle
